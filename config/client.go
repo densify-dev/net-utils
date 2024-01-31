@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/densify-dev/retry-config/consts"
 	rhttp "github.com/hashicorp/go-retryablehttp"
 	"net/http"
 	"strings"
@@ -10,7 +11,6 @@ import (
 
 // policies
 const (
-	Empty             = ""
 	DefaultPolicy     = "default"
 	ExponentialPolicy = "exponential"
 	JitterPolicy      = "jitter"
@@ -22,7 +22,7 @@ func ConstantBackoff(min, _ time.Duration, _ int, _ *http.Response) time.Duratio
 }
 
 var policies = map[string]rhttp.Backoff{
-	Empty:             rhttp.DefaultBackoff,
+	consts.Empty:      rhttp.DefaultBackoff,
 	DefaultPolicy:     rhttp.DefaultBackoff,
 	ExponentialPolicy: rhttp.DefaultBackoff,
 	JitterPolicy:      rhttp.LinearJitterBackoff,
