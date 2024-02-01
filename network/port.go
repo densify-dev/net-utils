@@ -90,23 +90,33 @@ func (p port) Uint64() uint64 {
 	return uint64(p)
 }
 
+type PortInput interface {
+	~uint64 | ~string
+}
+
 // NewPort returns a Port if the argument has a valid TCP/UDP port number
 // (no limitation of port type or type range), error otherwise
-func NewPort(s string) (Port, error) {
-	return NewPortForTypeRange(s, All)
+func NewPort[PI PortInput](pi PI) (Port, error) {
+	return NewPortForTypeRange(pi, All)
 }
 
 // NewPortForType returns a Port if the argument has a valid TCP/UDP port number
 // for the requested port type, error otherwise
-func NewPortForType(s string, pt portType) (Port, error) {
-	return NewPortForTypeRange(s, rangeOfSame(pt))
+func NewPortForType[PI PortInput](pi PI, pt portType) (Port, error) {
+	return NewPortForTypeRange(pi, rangeOfSame(pt))
 }
 
 // NewPortForTypeRange returns a Port if the argument has a valid TCP/UDP port number
 // for the requested port type range, error otherwise
-func NewPortForTypeRange(s string, ptr *portTypeRange) (p Port, err error) {
+func NewPortForTypeRange[PI PortInput](pi PI, ptr *portTypeRange) (p Port, err error) {
 	var n uint64
-	if n, err = strconv.ParseUint(s, 10, 64); err == nil {
+	switch v := any(pi).(type) {
+	case string:
+		n, err = strconv.ParseUint(v, 10, 64)
+	case uint64:
+		n = v
+	}
+	if err == nil {
 		if candidate := port(n); candidate.IsValidForTypeRange(ptr) {
 			p = candidate
 		} else {
