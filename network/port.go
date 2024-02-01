@@ -2,6 +2,7 @@ package network
 
 import (
 	"fmt"
+	"github.com/densify-dev/retry-config/consts"
 	"strconv"
 )
 
@@ -31,6 +32,7 @@ type Port interface {
 	IsValidForType(portType) bool
 	IsValidForTypeRange(*portTypeRange) bool
 	Uint64() uint64
+	Addr(string) string
 }
 
 type port uint64
@@ -88,6 +90,17 @@ func (p port) IsValidForTypeRange(ptr *portTypeRange) bool {
 
 func (p port) Uint64() uint64 {
 	return uint64(p)
+}
+
+const (
+	hostPortFormat = "%s%s%d"
+)
+
+func (p port) Addr(host string) (addr string) {
+	if p.IsValid() {
+		addr = fmt.Sprintf(hostPortFormat, host, consts.Colon, p)
+	}
+	return
 }
 
 type PortInput interface {
