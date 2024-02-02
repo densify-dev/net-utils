@@ -2,7 +2,7 @@ package network
 
 import (
 	"fmt"
-	"github.com/densify-dev/retry-config/consts"
+	"github.com/densify-dev/net-utils/common"
 	"strconv"
 )
 
@@ -98,7 +98,7 @@ const (
 
 func (p port) Addr(host string) (addr string) {
 	if p.IsValid() {
-		addr = fmt.Sprintf(hostPortFormat, host, consts.Colon, p)
+		addr = fmt.Sprintf(hostPortFormat, host, common.Colon, p)
 	}
 	return
 }

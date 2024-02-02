@@ -1,9 +1,9 @@
-package config
+package rhttp
 
 import (
 	"fmt"
-	"github.com/densify-dev/retry-config/consts"
-	rhttp "github.com/hashicorp/go-retryablehttp"
+	"github.com/densify-dev/net-utils/common"
+	hrhttp "github.com/hashicorp/go-retryablehttp"
 	"net/http"
 	"strings"
 	"time"
@@ -21,21 +21,21 @@ func ConstantBackoff(min, _ time.Duration, _ int, _ *http.Response) time.Duratio
 	return min
 }
 
-var policies = map[string]rhttp.Backoff{
-	consts.Empty:      rhttp.DefaultBackoff,
-	DefaultPolicy:     rhttp.DefaultBackoff,
-	ExponentialPolicy: rhttp.DefaultBackoff,
-	JitterPolicy:      rhttp.LinearJitterBackoff,
+var policies = map[string]hrhttp.Backoff{
+	common.Empty:      hrhttp.DefaultBackoff,
+	DefaultPolicy:     hrhttp.DefaultBackoff,
+	ExponentialPolicy: hrhttp.DefaultBackoff,
+	JitterPolicy:      hrhttp.LinearJitterBackoff,
 	ConstantPolicy:    ConstantBackoff,
 }
 
 type RetryConfig struct {
-	WaitMin     time.Duration `yaml:"wait_min"`
-	WaitMax     time.Duration `yaml:"wait_max"`
-	MaxAttempts int           `yaml:"max_attempts"`
-	Policy      string        `yaml:"policy,omitempty"`
-	backoff     rhttp.Backoff `yaml:"-"`
-	isValid     bool          `yaml:"-"`
+	WaitMin     time.Duration  `yaml:"wait_min"`
+	WaitMax     time.Duration  `yaml:"wait_max"`
+	MaxAttempts int            `yaml:"max_attempts"`
+	Policy      string         `yaml:"policy,omitempty"`
+	backoff     hrhttp.Backoff `yaml:"-"`
+	isValid     bool           `yaml:"-"`
 }
 
 // Validate must be called once, after rc has been constructed / unmarshalled
@@ -58,7 +58,7 @@ func (rc *RetryConfig) Validate() (err error) {
 // NewClient should be called only after Validate has been called, to make sure
 // that rc is a valid RetryConfig
 func (rc *RetryConfig) NewClient(rt http.RoundTripper, logger interface{}) (*http.Client, error) {
-	c := rhttp.NewClient()
+	c := hrhttp.NewClient()
 	if rc != nil {
 		if !rc.isValid {
 			return nil, fmt.Errorf("retry configuration is not valid")
@@ -69,10 +69,10 @@ func (rc *RetryConfig) NewClient(rt http.RoundTripper, logger interface{}) (*htt
 		c.Backoff = rc.backoff
 	}
 	c.HTTPClient = &http.Client{Transport: rt}
-	// set the logger (rhttp default logger is debug-level, too verbose)
+	// set the logger (hrhttp default logger is debug-level, too verbose)
 	if logger != nil {
 		switch logger.(type) {
-		case rhttp.Logger, rhttp.LeveledLogger:
+		case hrhttp.Logger, hrhttp.LeveledLogger:
 			// OK
 		default:
 			return nil, fmt.Errorf("invalid logger type %T", logger)

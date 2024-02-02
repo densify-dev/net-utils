@@ -2,7 +2,7 @@ package network
 
 import (
 	"fmt"
-	"github.com/densify-dev/retry-config/consts"
+	"github.com/densify-dev/net-utils/common"
 	"net"
 	"strings"
 )
@@ -46,19 +46,19 @@ func ParseAddressForPortTypeRange(s string, ptr *portTypeRange) (address string,
 }
 
 func parseAddressPort(s string) (addr, p string, hasPort bool) {
-	elems := strings.Split(s, consts.Colon)
+	elems := strings.Split(s, common.Colon)
 	if l := len(elems); l < 2 {
 		addr = s
 	} else {
 		n := l - 2
-		if n == 0 || (strings.HasPrefix(elems[0], consts.LeftSquareBracket) && strings.HasSuffix(elems[n], consts.RightSquareBracket)) {
+		if n == 0 || (strings.HasPrefix(elems[0], common.LeftSquareBracket) && strings.HasSuffix(elems[n], common.RightSquareBracket)) {
 			p = elems[n+1]
 			hasPort = true
 		} else {
 			n++
 		}
-		addr = strings.Join(elems[:n+1], consts.Colon)
+		addr = strings.Join(elems[:n+1], common.Colon)
 	}
-	addr = strings.TrimSuffix(strings.TrimPrefix(addr, consts.LeftSquareBracket), consts.RightSquareBracket)
+	addr = strings.TrimSuffix(strings.TrimPrefix(addr, common.LeftSquareBracket), common.RightSquareBracket)
 	return
 }

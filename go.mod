@@ -1,4 +1,4 @@
-module github.com/densify-dev/retry-config
+module github.com/densify-dev/net-utils
 
 go 1.21
 
