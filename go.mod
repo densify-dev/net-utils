@@ -1,6 +1,6 @@
 module github.com/densify-dev/net-utils
 
-go 1.22
+go 1.23
 
 require github.com/hashicorp/go-retryablehttp v0.7.7
 
